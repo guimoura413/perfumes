@@ -1,0 +1,672 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Perfumes — Coleção</title>
+<style>
+  :root{
+    --bg:#F7F6F3; --paper:#FFFFFF; --ink:#1F2420; --ink-soft:#5B6560;
+    --line:#DEDAD1; --line-strong:#C7C2B7;
+    --brick:#A6503B; --brick-soft:#F3E4DF;
+    --gold:#9C7A2E; --gold-soft:#F3ECDA;
+    --sky:#4E6E8C; --sky-soft:#E6ECF2;
+    --clay:#8F6A4A; --clay-soft:#EFE6DC;
+    --pine:#3D5A50; --pine-soft:#E7EEEA;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{background:var(--bg); color:var(--ink); font-family:system-ui,-apple-system,'Segoe UI',Roboto,sans-serif; -webkit-font-smoothing:antialiased; padding-bottom:82px;}
+  .num{font-family:ui-monospace,'SF Mono',Consolas,'Roboto Mono',monospace; font-variant-numeric:tabular-nums;}
+
+  header{position:sticky; top:0; z-index:20; background:var(--bg); border-bottom:1px solid var(--line-strong); padding:18px 16px 14px 16px;}
+  .brand{display:flex; align-items:baseline; justify-content:space-between; max-width:760px; margin:0 auto;}
+  .brand h1{font-size:15px; letter-spacing:.14em; text-transform:uppercase; font-weight:600; margin:0;}
+  .brand .sub{font-size:11px; color:var(--ink-soft); letter-spacing:.05em;}
+
+  main{max-width:760px; margin:0 auto; padding:20px 16px 0 16px;}
+
+  .page-hero{border-radius:10px; padding:18px; margin-bottom:16px; text-align:center;}
+  .page-hero.brick-bg{background:var(--brick-soft);}
+  .page-hero.clay-bg{background:var(--clay-soft);}
+  .page-hero.sky-bg{background:var(--sky-soft);}
+  .page-hero.gold-bg{background:var(--gold-soft);}
+  .page-hero.pine-bg{background:var(--pine-soft);}
+  .page-hero .amt{font-size:26px; font-weight:700;}
+  .page-hero.brick-bg .amt, .page-hero.brick-bg .lbl{color:var(--brick);}
+  .page-hero.clay-bg .amt, .page-hero.clay-bg .lbl{color:var(--clay);}
+  .page-hero.sky-bg .amt, .page-hero.sky-bg .lbl{color:var(--sky);}
+  .page-hero.gold-bg .amt, .page-hero.gold-bg .lbl{color:var(--gold);}
+  .page-hero.pine-bg .amt, .page-hero.pine-bg .lbl{color:var(--pine);}
+  .page-hero .lbl{font-size:11px; letter-spacing:.05em; text-transform:uppercase; margin-top:4px;}
+
+  .page-title{font-size:13px; font-weight:600; color:var(--ink-soft); margin:0 0 10px 2px; text-transform:uppercase; letter-spacing:.06em;}
+  .page-card{background:var(--paper); border:1px solid var(--line); border-radius:10px; padding:14px 16px; margin-bottom:16px;}
+
+  /* ---------- linhas de perfume ---------- */
+  .perf-row{border-bottom:1px solid var(--line); padding:11px 4px; border-left:3px solid transparent; padding-left:10px; margin-left:-10px;}
+  .perf-row:last-of-type{border-bottom:none;}
+  .perf-row.urgente{border-left-color:var(--brick); background:var(--brick-soft); border-radius:0 6px 6px 0;}
+  .perf-row.atencao{border-left-color:var(--gold); background:var(--gold-soft); border-radius:0 6px 6px 0;}
+  .perf-top{display:flex; justify-content:space-between; align-items:baseline; gap:8px;}
+  .perf-name{font-size:13.5px; font-weight:600;}
+  .perf-days{font-size:12px; font-weight:700; white-space:nowrap;}
+  .perf-row.urgente .perf-days{color:var(--brick);}
+  .perf-row.atencao .perf-days{color:var(--gold);}
+  .perf-meta{font-size:11px; color:var(--ink-soft); margin-top:4px; display:flex; gap:5px; flex-wrap:wrap; align-items:center;}
+  .perf-stats{font-size:10.5px; color:var(--ink-soft); margin-top:3px;}
+  .perf-note{font-size:11px; color:var(--ink-soft); margin-top:4px; font-style:italic;}
+  .perf-actions{display:flex; gap:6px; margin-top:8px; flex-wrap:wrap;}
+  .chip{display:inline-block; font-size:9.5px; padding:2px 8px; border-radius:10px; letter-spacing:.02em; font-weight:600;}
+  .chip.neutral{background:var(--line); color:var(--ink-soft); font-weight:500;}
+  .empty-hint{font-size:12px; color:var(--ink-soft); text-align:center; padding:18px 4px; line-height:1.5;}
+
+  .btn{font-size:12px; font-weight:600; padding:8px 13px; border-radius:6px; border:1px solid var(--ink); background:var(--ink); color:var(--paper); cursor:pointer; letter-spacing:.02em;}
+  .btn:hover{opacity:.85;}
+  .btn.ghost{background:transparent; color:var(--ink); border:1px solid var(--line-strong);}
+  .btn.small{padding:6px 10px; font-size:11px;}
+  .btn.full{width:100%;}
+  .btn.tiny{padding:4px 9px; font-size:10.5px;}
+
+  .add-form{display:grid; gap:8px; margin-top:12px; padding-top:12px; border-top:1px dashed var(--line-strong);}
+  .add-form .row2{display:grid; grid-template-columns:1fr 1fr; gap:8px;}
+  .add-form .row3{display:grid; grid-template-columns:1fr 1fr 1fr; gap:8px;}
+  .add-form .row4{display:grid; grid-template-columns:1fr 1fr 1fr 1fr; gap:6px;}
+  .field-label{font-size:10px; color:var(--ink-soft); letter-spacing:.03em; text-transform:uppercase; margin:0 0 -3px 2px;}
+  input[type=text], input[type=number], input[type=date], select, textarea{
+    width:100%; font-size:13px; padding:9px 10px; border-radius:6px;
+    border:1px solid var(--line-strong); background:var(--bg); color:var(--ink); font-family:system-ui,sans-serif;
+  }
+  input[type=number], input[type=date]{font-family:ui-monospace,monospace;}
+  textarea{resize:vertical; min-height:40px;}
+  select{appearance:none; background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%235B6560'/%3E%3C/svg%3E"); background-repeat:no-repeat; background-position:right 10px center; padding-right:28px;}
+
+  /* ---------- seletor de cheiro (chips clicáveis) ---------- */
+  .scent-picker{display:flex; flex-wrap:wrap; gap:6px; margin-top:4px;}
+  .scent-chip{font-size:11.5px; padding:6px 12px; border-radius:20px; border:1.5px solid transparent; cursor:pointer; font-weight:600; background:var(--line); color:var(--ink-soft);}
+  .scent-chip.selected{border-color:currentColor;}
+  .scent-chip.add-new{background:transparent; border:1.5px dashed var(--line-strong); color:var(--ink-soft);}
+  .new-scent-box{display:flex; gap:6px; align-items:center; margin-top:8px; padding:8px; background:var(--bg); border-radius:8px;}
+  .new-scent-box input[type=text]{flex:1;}
+  .new-scent-box input[type=color]{width:38px; height:38px; padding:2px; border-radius:6px; border:1px solid var(--line-strong); background:var(--paper);}
+
+  .prod-top-row{display:flex; gap:6px; margin-bottom:4px;}
+
+  .footer-note{font-size:11px; color:var(--ink-soft); margin:10px 0 0 0; line-height:1.6;}
+  .footer-actions{display:flex; gap:8px; flex-wrap:wrap; margin-top:14px; margin-bottom:20px;}
+  .card-hint{font-size:12px; color:var(--ink-soft); margin:0 0 12px 0; line-height:1.5;}
+
+  nav.bottom-nav{position:fixed; left:0; right:0; bottom:0; z-index:30; background:var(--paper); border-top:1px solid var(--line-strong); display:flex; padding:0 4px;}
+  .nav-btn{flex:1; background:none; border:none; padding:9px 2px 8px 2px; display:flex; flex-direction:column; align-items:center; gap:3px; cursor:pointer; color:var(--ink-soft); font-size:9.6px; letter-spacing:0; border-top:2px solid transparent;}
+  .nav-btn .dot{width:6px; height:6px; border-radius:50%; background:var(--line-strong);}
+  .nav-btn.active{color:var(--ink); font-weight:600;}
+  .nav-btn.active.atuais{border-top-color:var(--ink);}
+  .nav-btn.active.desejos{border-top-color:var(--sky); color:var(--sky);}
+  .nav-btn.active.desejos .dot{background:var(--sky);}
+  .nav-btn.active.evitar{border-top-color:var(--clay); color:var(--clay);}
+  .nav-btn.active.evitar .dot{background:var(--clay);}
+  .nav-btn.active.promocoes{border-top-color:var(--pine); color:var(--pine);}
+  .nav-btn.active.promocoes .dot{background:var(--pine);}
+  .nav-btn.active.conta{border-top-color:var(--gold); color:var(--gold);}
+  .nav-btn.active.conta .dot{background:var(--gold);}
+
+  .toast{position:fixed; bottom:74px; left:50%; transform:translateX(-50%) translateY(20px); background:var(--ink); color:var(--paper); padding:10px 18px; border-radius:8px; font-size:12px; opacity:0; transition:all .2s; pointer-events:none; z-index:50;}
+  .toast.show{opacity:1; transform:translateX(-50%) translateY(0);}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="brand">
+    <h1>Perfumes</h1>
+    <span class="sub" id="brandSub">salvo neste navegador</span>
+  </div>
+</header>
+
+<main id="main"></main>
+
+<div class="toast" id="toast"></div>
+
+<nav class="bottom-nav">
+  <button class="nav-btn atuais" data-view="atuais" onclick="setView('atuais')"><span class="dot"></span>Atuais</button>
+  <button class="nav-btn desejos" data-view="desejos" onclick="setView('desejos')"><span class="dot"></span>Desejos</button>
+  <button class="nav-btn evitar" data-view="evitar" onclick="setView('evitar')"><span class="dot"></span>Evitar</button>
+  <button class="nav-btn promocoes" data-view="promocoes" onclick="setView('promocoes')"><span class="dot"></span>Promoções</button>
+  <button class="nav-btn conta" data-view="conta" onclick="setView('conta')"><span class="dot"></span>Conta</button>
+</nav>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+/* ========================= estado ========================= */
+const STORAGE_KEY = 'perfumes_v1';
+const TYPE_OPTIONS = ['Perfume','Body Splash','Colônia','Deo Colônia','Outro'];
+const DEFAULT_SCENTS = [
+  {name:'Fresco', color:'#6E9C93'}, {name:'Doce', color:'#C48792'}, {name:'Amadeirado', color:'#A98B6E'},
+  {name:'Cítrico', color:'#BFA14A'}, {name:'Floral', color:'#C98A9E'}, {name:'Gourmand', color:'#B08B6A'},
+  {name:'Aquático', color:'#7E92AC'}, {name:'Oriental', color:'#8C7A9B'}, {name:'Amadeirado especiado', color:'#8F6A4A'},
+  {name:'Verde', color:'#93A05F'}, {name:'Couro', color:'#6B5B4A'}
+];
+
+function loadState(){
+  try{
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if(raw){
+      const d = JSON.parse(raw);
+      if(!Array.isArray(d.perfumes)) d.perfumes = [];
+      if(!Array.isArray(d.scents) || !d.scents.length) d.scents = DEFAULT_SCENTS.map(s=>({id:uid(),...s}));
+      return d;
+    }
+  }catch(e){}
+  return { perfumes:[], scents: DEFAULT_SCENTS.map(s=>({id:uid(),...s})) };
+}
+let state = loadState();
+let currentView = 'atuais';
+let editingId = null;
+let showNewScentBox = false;
+let pendingScent = null; // cheiro selecionado no formulário atual (nome)
+let formDraft = null; // guarda os campos do formulário entre re-renderizações (ex: ao clicar num chip de cheiro)
+
+const FORM_FIELD_IDS = ['pf-name','pf-tipo','pf-status','pf-afinidade','pf-fixacao','pf-projecao','pf-assinatura','pf-preconormal','pf-precopago','pf-local','pf-datacompra','pf-datavalidade','pf-duracao','pf-duracaounit','pf-note'];
+function captureFormDraft(){
+  const probe = document.getElementById('pf-name');
+  if(!probe) return;
+  const d = {};
+  FORM_FIELD_IDS.forEach(id=>{ const el=document.getElementById(id); if(el) d[id.slice(3)] = el.value; });
+  formDraft = d;
+}
+
+function save(){ localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); scheduleSync(); }
+function uid(){ return Math.random().toString(36).slice(2,9); }
+function fmt(n){ n=Number(n)||0; return 'R$ ' + n.toLocaleString('pt-BR',{minimumFractionDigits:2, maximumFractionDigits:2}); }
+function todayISO(){ const d=new Date(); d.setHours(0,0,0,0); return d.toISOString().slice(0,10); }
+function pct(n){ return (n===''||n===undefined||n===null) ? '—' : n+'%'; }
+function scentColor(name){
+  const s = state.scents.find(x=>x.name.toLowerCase()===String(name||'').toLowerCase());
+  return s ? s.color : '#9C978B';
+}
+
+/* ========================= cálculo de validade/duração ========================= */
+function toDays(n, unit){
+  n = Number(n)||0;
+  if(unit==='dias') return n;
+  if(unit==='semanas') return n*7;
+  if(unit==='anos') return n*365;
+  return n*30;
+}
+function computeOwned(p){
+  const totalDays = Math.max(1, toDays(p.duracao, p.duracaoUnit||'meses'));
+  const purchase = new Date((p.dataCompra||todayISO())+'T00:00:00');
+  const next = new Date(purchase.getTime() + totalDays*86400000);
+  const today = new Date(); today.setHours(0,0,0,0);
+  const daysRemaining = Math.round((next-today)/86400000);
+  let expiryDaysRemaining = null;
+  if(p.dataValidade){ const exp = new Date(p.dataValidade+'T00:00:00'); expiryDaysRemaining = Math.round((exp-today)/86400000); }
+  const urgentByDuration = daysRemaining<=7;
+  const urgentByExpiry = expiryDaysRemaining!==null && expiryDaysRemaining<=7;
+  const isUrgent = urgentByDuration || urgentByExpiry;
+  const isAtencao = !isUrgent && daysRemaining <= totalDays/2;
+  return {totalDays, daysRemaining, expiryDaysRemaining, isUrgent, isAtencao, urgentByExpiry};
+}
+function daysLabel(c){
+  if(c.daysRemaining < 0) return `${Math.abs(c.daysRemaining)}d atrasado`;
+  if(c.daysRemaining === 0) return 'hoje';
+  return `${c.daysRemaining}d restantes`;
+}
+function avgScore(p){
+  const vals = [p.afinidade,p.fixacao,p.projecao,p.assinatura].map(v=>Number(v)||0);
+  return vals.reduce((a,b)=>a+b,0)/4;
+}
+
+/* ========================= nuvem (Supabase) ========================= */
+const SUPABASE_URL = 'https://eveydplfsogfhpieiilu.supabase.co';
+const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImV2ZXlkcGxmc29nZmhwaWVpaWx1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODYzMTcxMjQsImV4cCI6MjEwMTg5MzEyNH0.gN52Qjgiyv0X7Crjm1qinygbojEO4xlWJzuWUzoWoG0';
+const sb = window.supabase ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY) : null;
+const TABLE = 'perfumes_data';
+let currentUser = null;
+let syncStatus = 'offline';
+let syncTimer = null;
+
+async function initAuth(){
+  if(!sb) return;
+  try{
+    const { data:{ session } } = await sb.auth.getSession();
+    if(session){ currentUser = session.user; await pullFromCloud(); render(); }
+  }catch(e){}
+  sb.auth.onAuthStateChange(async (event, session)=>{
+    if(session && (!currentUser || currentUser.id!==session.user.id)){
+      currentUser = session.user;
+      await pullFromCloud();
+      toast('Conectado! Dados sincronizados.');
+      render();
+    } else if(!session && currentUser){
+      currentUser = null; render();
+    }
+  });
+}
+async function pullFromCloud(){
+  syncStatus='syncing';
+  try{
+    const { data, error } = await sb.from(TABLE).select('data').eq('user_id', currentUser.id).maybeSingle();
+    if(error) throw error;
+    if(data && data.data && Object.keys(data.data).length){
+      state = data.data;
+      if(!Array.isArray(state.perfumes)) state.perfumes=[];
+      if(!Array.isArray(state.scents) || !state.scents.length) state.scents = DEFAULT_SCENTS.map(s=>({id:uid(),...s}));
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+    } else { await pushToCloud(); }
+    syncStatus='synced';
+  }catch(e){ syncStatus='error'; }
+}
+async function pushToCloud(){
+  if(!currentUser || !sb) return;
+  syncStatus='syncing';
+  try{
+    const { error } = await sb.from(TABLE).upsert({ user_id: currentUser.id, data: state, updated_at: new Date().toISOString() });
+    if(error) throw error;
+    syncStatus='synced';
+  }catch(e){ syncStatus='error'; }
+}
+function scheduleSync(){ if(!currentUser) return; clearTimeout(syncTimer); syncTimer = setTimeout(pushToCloud, 900); }
+window.loginMagicLink = async function(){
+  const email = document.getElementById('login-email').value.trim();
+  if(!email) return toast('Digite seu e-mail');
+  const { error } = await sb.auth.signInWithOtp({ email, options:{ emailRedirectTo: window.location.href } });
+  if(error) return toast('Erro: '+error.message);
+  toast('Link enviado! Confere seu e-mail.');
+};
+window.logout = async function(){ await sb.auth.signOut(); currentUser=null; render(); toast('Desconectado. Dados continuam salvos neste navegador.'); };
+
+/* ========================= navegação / render raiz ========================= */
+window.setView = function(v){ currentView=v; editingId=null; showNewScentBox=false; pendingScent=null; formDraft=null; render(); };
+
+function render(){
+  const active = document.activeElement;
+  const activeId = active && active.id;
+  const selStart = active && typeof active.selectionStart==='number' ? active.selectionStart : null;
+  const selEnd = active && typeof active.selectionEnd==='number' ? active.selectionEnd : null;
+
+  renderNav();
+  updateBrandSub();
+  if(currentView==='atuais') renderAtuais();
+  else if(currentView==='desejos') renderDesejos();
+  else if(currentView==='evitar') renderEvitar();
+  else if(currentView==='promocoes') renderPromocoes();
+  else if(currentView==='conta') renderConta();
+
+  if(activeId){
+    const el = document.getElementById(activeId);
+    if(el && (el.tagName==='INPUT'||el.tagName==='TEXTAREA')){
+      el.focus();
+      if(selStart!=null && el.setSelectionRange){ try{ el.setSelectionRange(selStart, selEnd); }catch(e){} }
+    }
+  }
+  save();
+}
+function renderNav(){ document.querySelectorAll('.nav-btn').forEach(b=> b.classList.toggle('active', b.dataset.view===currentView)); }
+function updateBrandSub(){
+  const el = document.getElementById('brandSub');
+  if(currentUser) el.textContent = syncStatus==='synced' ? 'sincronizado · '+currentUser.email : syncStatus==='syncing' ? 'sincronizando…' : 'erro de sincronização';
+  else el.textContent = 'salvo neste navegador';
+}
+
+/* ========================= seletor de cheiro ========================= */
+function scentPickerHtml(){
+  const chips = state.scents.map(s=>{
+    const sel = pendingScent===s.name;
+    return `<button type="button" class="scent-chip ${sel?'selected':''}" style="background:${s.color}22; color:${s.color};" onclick="pickScent('${s.name.replace(/'/g,"\\'")}')">${s.name}</button>`;
+  }).join('');
+  return `
+    <p class="field-label">Cheiro</p>
+    <div class="scent-picker">
+      ${chips}
+      <button type="button" class="scent-chip add-new" onclick="toggleNewScent()">+ novo cheiro</button>
+    </div>
+    ${showNewScentBox ? `
+      <div class="new-scent-box">
+        <input type="text" id="new-scent-name" placeholder="Nome do cheiro">
+        <input type="color" id="new-scent-color" value="#8C7A9B">
+        <button type="button" class="btn tiny" onclick="addNewScent()">OK</button>
+      </div>` : ''}
+  `;
+}
+window.pickScent = function(name){ captureFormDraft(); pendingScent = name; render(); };
+window.toggleNewScent = function(){ captureFormDraft(); showNewScentBox = !showNewScentBox; render(); };
+window.addNewScent = function(){
+  const name = document.getElementById('new-scent-name').value.trim();
+  const color = document.getElementById('new-scent-color').value;
+  if(!name) return toast('Digite o nome do cheiro');
+  captureFormDraft();
+  state.scents.push({id:uid(), name, color});
+  pendingScent = name;
+  showNewScentBox = false;
+  render();
+};
+
+/* ========================= formulário compartilhado ========================= */
+function perfumeForm(defaultStatus){
+  const editing = editingId ? state.perfumes.find(x=>x.id===editingId) : null;
+  if(editing && pendingScent===null) pendingScent = editing.cheiro;
+  const base = editing ? {
+    name:editing.name, tipo:editing.tipo, afinidade:editing.afinidade, fixacao:editing.fixacao,
+    projecao:editing.projecao, assinatura:editing.assinatura, preconormal:editing.precoNormal,
+    precopago:editing.precoPago, local:editing.local, status:editing.status, datacompra:editing.dataCompra,
+    datavalidade:editing.dataValidade, duracao:editing.duracao, duracaounit:editing.duracaoUnit, note:editing.note
+  } : {name:'',tipo:'Perfume',status:defaultStatus,afinidade:'',fixacao:'',projecao:'',assinatura:'',
+    preconormal:'',precopago:'',local:'',datacompra:todayISO(),datavalidade:'',duracao:'',duracaounit:'meses',note:''};
+  const v = formDraft ? {...base, ...formDraft} : base;
+  return `
+    <div class="add-form">
+      <div>
+        <p class="field-label">Nome do perfume</p>
+        <input type="text" id="pf-name" placeholder="Ex: Bleu de Chanel" value="${v.name}">
+      </div>
+      <div class="row2">
+        <div><p class="field-label">Tipo</p>
+          <select id="pf-tipo">${TYPE_OPTIONS.map(t=>`<option value="${t}" ${v.tipo===t?'selected':''}>${t}</option>`).join('')}</select>
+        </div>
+        <div><p class="field-label">Status</p>
+          <select id="pf-status" onchange="document.getElementById('owned-fields').style.display = this.value==='possui' ? 'grid' : 'none';">
+            <option value="possui" ${v.status==='possui'?'selected':''}>Já tenho</option>
+            <option value="compraria" ${v.status==='compraria'?'selected':''}>Compraria</option>
+            <option value="nao_compraria" ${v.status==='nao_compraria'?'selected':''}>Não compraria mais</option>
+          </select>
+        </div>
+      </div>
+      ${scentPickerHtml()}
+      <div class="row4">
+        <div><p class="field-label">Afinidade %</p><input type="number" id="pf-afinidade" min="0" max="100" value="${v.afinidade}"></div>
+        <div><p class="field-label">Fixação %</p><input type="number" id="pf-fixacao" min="0" max="100" value="${v.fixacao}"></div>
+        <div><p class="field-label">Projeção %</p><input type="number" id="pf-projecao" min="0" max="100" value="${v.projecao}"></div>
+        <div><p class="field-label">Assinatura %</p><input type="number" id="pf-assinatura" min="0" max="100" value="${v.assinatura}"></div>
+      </div>
+      <div class="row3">
+        <div><p class="field-label">Preço normal</p><input type="number" id="pf-preconormal" placeholder="0,00" value="${v.preconormal}"></div>
+        <div><p class="field-label">Preço pago (promo)</p><input type="number" id="pf-precopago" placeholder="0,00" value="${v.precopago}"></div>
+        <div><p class="field-label">Onde comprou</p><input type="text" id="pf-local" placeholder="Ex: loja X" value="${v.local}"></div>
+      </div>
+      <div id="owned-fields" style="display:${v.status==='possui'?'grid':'none'}; gap:8px;">
+        <div class="row3">
+          <div><p class="field-label">Data da compra</p><input type="date" id="pf-datacompra" value="${v.datacompra}"></div>
+          <div><p class="field-label">Validade (opcional)</p><input type="date" id="pf-datavalidade" value="${v.datavalidade}"></div>
+          <div><p class="field-label">Dura quanto</p><input type="number" id="pf-duracao" placeholder="Ex: 6" value="${v.duracao}"></div>
+        </div>
+        <select id="pf-duracaounit" style="max-width:160px;">
+          <option value="dias" ${v.duracaounit==='dias'?'selected':''}>dias</option>
+          <option value="semanas" ${v.duracaounit==='semanas'?'selected':''}>semanas</option>
+          <option value="meses" ${v.duracaounit==='meses'?'selected':''}>meses</option>
+          <option value="anos" ${v.duracaounit==='anos'?'selected':''}>anos</option>
+        </select>
+      </div>
+      <div>
+        <p class="field-label">Observação</p>
+        <textarea id="pf-note" placeholder="Ex: testei na loja, cheiro de...">${v.note}</textarea>
+      </div>
+      <div style="display:flex; gap:8px;">
+        <button class="btn full" onclick="savePerfumeForm()">${editing?'Salvar edição':'Adicionar perfume'}</button>
+        ${editing?`<button class="btn ghost" onclick="cancelEdit()">Cancelar</button>`:''}
+      </div>
+    </div>
+  `;
+}
+window.savePerfumeForm = function(){
+  const name = document.getElementById('pf-name').value.trim();
+  if(!name) return toast('Digite o nome do perfume');
+  const obj = {
+    id: editingId||uid(), name,
+    tipo: document.getElementById('pf-tipo').value,
+    status: document.getElementById('pf-status').value,
+    cheiro: pendingScent || '',
+    afinidade: document.getElementById('pf-afinidade').value,
+    fixacao: document.getElementById('pf-fixacao').value,
+    projecao: document.getElementById('pf-projecao').value,
+    assinatura: document.getElementById('pf-assinatura').value,
+    precoNormal: document.getElementById('pf-preconormal').value,
+    precoPago: document.getElementById('pf-precopago').value,
+    local: document.getElementById('pf-local').value.trim(),
+    dataCompra: document.getElementById('pf-datacompra').value || todayISO(),
+    dataValidade: document.getElementById('pf-datavalidade').value,
+    duracao: document.getElementById('pf-duracao').value,
+    duracaoUnit: document.getElementById('pf-duracaounit').value,
+    note: document.getElementById('pf-note').value.trim()
+  };
+  if(editingId){
+    const idx = state.perfumes.findIndex(x=>x.id===editingId);
+    state.perfumes[idx] = obj;
+  } else {
+    state.perfumes.push(obj);
+  }
+  editingId = null; pendingScent = null; showNewScentBox=false; formDraft=null;
+  render();
+};
+window.startEdit = function(id){ editingId = id; pendingScent = null; formDraft=null; render(); };
+window.cancelEdit = function(){ editingId = null; pendingScent = null; formDraft=null; render(); };
+window.delPerfume = function(id){ state.perfumes = state.perfumes.filter(p=>p.id!==id); render(); };
+window.repurchase = function(id){
+  const p = state.perfumes.find(x=>x.id===id);
+  if(!p) return;
+  p.dataCompra = todayISO();
+  toast('Recompra registrada — contador reiniciado');
+  render();
+};
+
+/* ========================= ABA: ATUAIS ========================= */
+function renderAtuais(){
+  const list = state.perfumes.filter(p=>p.status==='possui')
+    .map(p=>({p, c:computeOwned(p)}))
+    .sort((a,b)=>{ if(a.c.isUrgent!==b.c.isUrgent) return a.c.isUrgent?-1:1; return a.c.daysRemaining-b.c.daysRemaining; });
+  const urgentCount = list.filter(x=>x.c.isUrgent).length;
+
+  const rows = list.map(({p,c})=>`
+    <div class="perf-row ${c.isUrgent?'urgente':c.isAtencao?'atencao':''}">
+      <div class="perf-top"><span class="perf-name">${p.name}</span><span class="perf-days">${daysLabel(c)}</span></div>
+      <div class="perf-meta">
+        <span class="chip" style="background:${scentColor(p.cheiro)}22; color:${scentColor(p.cheiro)};">${p.cheiro||'sem cheiro'}</span>
+        <span class="chip neutral">${p.tipo}</span>
+        ${c.urgentByExpiry?'<span class="chip" style="background:var(--brick); color:#fff;">validade</span>':''}
+      </div>
+      <div class="perf-stats">Afinidade ${pct(p.afinidade)} · Fixação ${pct(p.fixacao)} · Projeção ${pct(p.projecao)} · Assinatura ${pct(p.assinatura)}</div>
+      ${p.note?`<div class="perf-note">${p.note}</div>`:''}
+      <div class="perf-actions">
+        <button class="btn tiny ghost" onclick="startEdit('${p.id}')">Editar</button>
+        <button class="btn tiny ghost" onclick="repurchase('${p.id}')">Recomprei hoje</button>
+        <button class="btn tiny ghost" onclick="delPerfume('${p.id}')" style="color:var(--brick);">Excluir</button>
+      </div>
+    </div>`).join('') || `<p class="empty-hint">Nenhum perfume cadastrado como "já tenho" ainda.</p>`;
+
+  document.getElementById('main').innerHTML = `
+    <div class="page-hero ${urgentCount>0?'brick-bg':'gold-bg'}">
+      <div class="amt">${urgentCount}</div>
+      <div class="lbl">${urgentCount>0?'precisando de atenção':'tudo em dia'}</div>
+    </div>
+    <div class="page-card">
+      ${rows}
+      ${perfumeForm('possui')}
+    </div>
+    ${chartCard()}
+    <div class="footer-actions">
+      <button class="btn ghost small" onclick="shareBackup()">Compartilhar backup</button>
+      <button class="btn ghost small" onclick="exportBackup()">Baixar backup</button>
+      <button class="btn ghost small" onclick="document.getElementById('importFile').click()">Importar backup</button>
+      <input type="file" id="importFile" accept=".json" style="display:none" onchange="importBackup(event)">
+    </div>
+    <p class="footer-note">Perfumes em vermelho (duração ou validade acabando) sobem pro topo automaticamente.</p>
+  `;
+}
+function chartCard(){
+  const counts = {};
+  state.perfumes.filter(p=>p.cheiro).forEach(p=> counts[p.cheiro] = (counts[p.cheiro]||0)+1);
+  const rows = Object.entries(counts).sort((a,b)=>b[1]-a[1]);
+  const max = Math.max(1, ...rows.map(r=>r[1]));
+  return `
+    <div class="page-card">
+      <p class="page-title" style="margin-top:0;">Coleção por cheiro</p>
+      <div style="display:grid; gap:8px;">
+        ${rows.length?rows.map(([name,n])=>`
+          <div style="display:grid; grid-template-columns:96px 1fr 30px; gap:8px; align-items:center;">
+            <span style="font-size:11px; color:var(--ink-soft); overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">${name}</span>
+            <div style="background:var(--bg); border-radius:4px; height:14px; overflow:hidden; border:1px solid var(--line);">
+              <div style="height:100%; border-radius:3px; width:${(n/max*100).toFixed(0)}%; background:${scentColor(name)};"></div>
+            </div>
+            <span style="font-size:11px; text-align:right;" class="num">${n}</span>
+          </div>`).join('') : `<p class="empty-hint" style="padding:4px 0;">Sem dados ainda.</p>`}
+      </div>
+    </div>`;
+}
+
+/* ========================= ABA: DESEJOS ========================= */
+function renderDesejos(){
+  const list = state.perfumes.filter(p=>p.status==='compraria').sort((a,b)=>avgScore(b)-avgScore(a));
+  const rows = list.map(p=>`
+    <div class="perf-row">
+      <div class="perf-top"><span class="perf-name">${p.name}</span><span class="perf-days num">${avgScore(p).toFixed(0)}%</span></div>
+      <div class="perf-meta">
+        <span class="chip" style="background:${scentColor(p.cheiro)}22; color:${scentColor(p.cheiro)};">${p.cheiro||'sem cheiro'}</span>
+        <span class="chip neutral">${p.tipo}</span>
+        ${p.precoNormal?`<span class="chip neutral">${fmt(p.precoNormal)}</span>`:''}
+      </div>
+      <div class="perf-stats">Afinidade ${pct(p.afinidade)} · Fixação ${pct(p.fixacao)} · Projeção ${pct(p.projecao)} · Assinatura ${pct(p.assinatura)}</div>
+      ${p.note?`<div class="perf-note">${p.note}</div>`:''}
+      <div class="perf-actions">
+        <button class="btn tiny ghost" onclick="startEdit('${p.id}')">Editar</button>
+        <button class="btn tiny ghost" onclick="delPerfume('${p.id}')" style="color:var(--brick);">Excluir</button>
+      </div>
+    </div>`).join('') || `<p class="empty-hint">Nada na lista de desejos ainda.</p>`;
+
+  document.getElementById('main').innerHTML = `
+    <div class="page-hero sky-bg">
+      <div class="amt">${list.length}</div>
+      <div class="lbl">na lista de desejos</div>
+    </div>
+    <div class="page-card">
+      <p class="card-hint" style="margin-top:0;">Ordenado pela média das 4 porcentagens — o mais provável de você comprar fica no topo.</p>
+      ${rows}
+      ${perfumeForm('compraria')}
+    </div>
+  `;
+}
+
+/* ========================= ABA: EVITAR ========================= */
+function renderEvitar(){
+  const list = state.perfumes.filter(p=>p.status==='nao_compraria');
+  const rows = list.map(p=>`
+    <div class="perf-row">
+      <div class="perf-top"><span class="perf-name">${p.name}</span></div>
+      <div class="perf-meta">
+        <span class="chip" style="background:${scentColor(p.cheiro)}22; color:${scentColor(p.cheiro)};">${p.cheiro||'sem cheiro'}</span>
+        <span class="chip neutral">${p.tipo}</span>
+      </div>
+      ${p.note?`<div class="perf-note">${p.note}</div>`:''}
+      <div class="perf-actions">
+        <button class="btn tiny ghost" onclick="startEdit('${p.id}')">Editar</button>
+        <button class="btn tiny ghost" onclick="delPerfume('${p.id}')" style="color:var(--brick);">Excluir</button>
+      </div>
+    </div>`).join('') || `<p class="empty-hint">Nada aqui ainda.</p>`;
+
+  document.getElementById('main').innerHTML = `
+    <div class="page-hero clay-bg">
+      <div class="amt">${list.length}</div>
+      <div class="lbl">nunca mais compro</div>
+    </div>
+    <div class="page-card">
+      ${rows}
+      ${perfumeForm('nao_compraria')}
+    </div>
+  `;
+}
+
+/* ========================= ABA: PROMOÇÕES ========================= */
+function renderPromocoes(){
+  const list = state.perfumes.filter(p=> p.precoPago!=='' && p.precoPago!=null && Number(p.precoPago)>0)
+    .sort((a,b)=> Number(a.precoPago)-Number(b.precoPago));
+  const rows = list.map(p=>{
+    const desconto = p.precoNormal ? Math.round((1 - Number(p.precoPago)/Number(p.precoNormal))*100) : null;
+    return `
+    <div class="perf-row">
+      <div class="perf-top"><span class="perf-name">${p.name}</span><span class="perf-days num" style="color:var(--pine);">${fmt(p.precoPago)}</span></div>
+      <div class="perf-meta">
+        <span class="chip" style="background:${scentColor(p.cheiro)}22; color:${scentColor(p.cheiro)};">${p.cheiro||'sem cheiro'}</span>
+        ${p.precoNormal?`<span class="chip neutral">de ${fmt(p.precoNormal)}</span>`:''}
+        ${desconto!==null?`<span class="chip" style="background:var(--pine-soft); color:var(--pine);">-${desconto}%</span>`:''}
+        ${p.local?`<span class="chip neutral">${p.local}</span>`:''}
+      </div>
+    </div>`;
+  }).join('') || `<p class="empty-hint">Cadastre o "preço pago" num perfume pra ele aparecer aqui.</p>`;
+
+  document.getElementById('main').innerHTML = `
+    <div class="page-hero pine-bg">
+      <div class="amt">${list.length}</div>
+      <div class="lbl">comprados com desconto</div>
+    </div>
+    <div class="page-card">
+      <p class="card-hint" style="margin-top:0;">Ordenado do mais barato pro mais caro — bom indicador de qual recomprar.</p>
+      ${rows}
+    </div>
+  `;
+}
+
+/* ========================= ABA: CONTA ========================= */
+function renderConta(){
+  const main = document.getElementById('main');
+  if(!sb){
+    main.innerHTML = `<div class="page-card"><p class="card-hint" style="margin-top:0;">Não foi possível carregar o módulo de login. Verifique a conexão e recarregue.</p></div>`;
+    return;
+  }
+  if(currentUser){
+    const statusTxt = syncStatus==='synced' ? 'sincronizado' : syncStatus==='syncing' ? 'sincronizando…' : 'erro ao sincronizar';
+    main.innerHTML = `
+      <div class="page-hero gold-bg">
+        <div class="amt" style="font-size:16px; word-break:break-all;">${currentUser.email}</div>
+        <div class="lbl">${statusTxt}</div>
+      </div>
+      <div class="page-card">
+        <p class="card-hint" style="margin-top:0;">Seus dados sincronizam sozinhos em qualquer aparelho que você logar com este e-mail.</p>
+        <button class="btn full ghost" onclick="logout()">Sair da conta</button>
+      </div>`;
+  } else {
+    main.innerHTML = `
+      <div class="page-hero gold-bg">
+        <div class="lbl">sem login — dados só neste navegador</div>
+      </div>
+      <div class="page-card">
+        <p class="card-hint" style="margin-top:0;">Faça login pra sincronizar automaticamente em qualquer aparelho. Só o e-mail — sem senha.</p>
+        <input type="text" id="login-email" placeholder="seu@email.com">
+        <button class="btn full" style="background:var(--gold); border-color:var(--gold); margin-top:8px;" onclick="loginMagicLink()">Enviar link de acesso</button>
+      </div>`;
+  }
+}
+
+/* ========================= backup ========================= */
+function toast(msg){ const t=document.getElementById('toast'); t.textContent=msg; t.classList.add('show'); setTimeout(()=>t.classList.remove('show'),2200); }
+function exportBackup(){
+  const blob = new Blob([JSON.stringify(state,null,2)], {type:'application/json'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a'); a.href=url; a.download='perfumes-backup.json'; a.click();
+  URL.revokeObjectURL(url); toast('Backup baixado');
+}
+async function shareBackup(){
+  try{
+    const blob = new Blob([JSON.stringify(state,null,2)], {type:'application/json'});
+    const file = new File([blob], 'perfumes-backup-'+todayISO()+'.json', {type:'application/json'});
+    if(navigator.canShare && navigator.canShare({files:[file]})){ await navigator.share({files:[file], title:'Backup Perfumes'}); toast('Backup compartilhado'); }
+    else toast('Indisponível aqui — use "Baixar backup"');
+  }catch(e){ if(e.name!=='AbortError') toast('Não foi possível compartilhar'); }
+}
+function importBackup(ev){
+  const file = ev.target.files[0]; if(!file) return;
+  const reader = new FileReader();
+  reader.onload = e=>{
+    try{
+      const data = JSON.parse(e.target.result);
+      if(!Array.isArray(data.perfumes)) throw new Error('formato inválido');
+      state = data; render(); toast('Backup importado');
+    }catch(err){ toast('Arquivo inválido'); }
+  };
+  reader.readAsText(file); ev.target.value='';
+}
+
+/* ========================= init ========================= */
+render();
+initAuth();
+</script>
+</body>
+</html>
